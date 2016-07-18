@@ -218,6 +218,7 @@ Returns:
 function LM:embed_note(kwargs)
   local embed_text_file = utils.get_kwarg(kwargs, 'embed_text_file', '')
   local verbose = utils.get_kwarg(kwargs, 'verbose', 0)
+  local out_dir = utils.get_kwarg(kwargs, 'out_dir', '~/data')
 
   self:resetStates()
 
@@ -227,29 +228,27 @@ function LM:embed_note(kwargs)
     print('Seeding with: "' .. embed_text .. '"')
   end
   local x = self:encode_string(embed_text):view(1, -1)
-  print(x)
-  print(#x)
   local T0 = x:size(2)
   _ = self:forward(x)[{{}, {T0, T0}}]
 
-  print('Writing input to /home/fl350/data/input.h5')
-  local myFile = hdf5.open('/home/fl350/data/input.h5', 'w')
-  myFile:write('/home/fl350/data/input.h5', x)
+  print('Writing input to ' .. out_dir .. '/input.h5')
+  local myFile = hdf5.open(out_dir .. '/input.h5', 'w')
+  myFile:write(out_dir .. '/input.h5', x)
   myFile:close()
 
-  print('Writing memory state to /home/fl350/data/embedding-lstm1.h5')
-  myFile = hdf5.open('/home/fl350/data/embedding-lstm1.h5', 'w')
-  myFile:write('/home/fl350/data/embedding-lstm1.h5', self.net.modules[2].cell:double():squeeze())
+  print('Writing memory state to ' .. out_dir .. '/embedding-lstm1.h5')
+  myFile = hdf5.open(out_dir .. '/embedding-lstm1.h5', 'w')
+  myFile:write(out_dir .. '/embedding-lstm1.h5', self.net.modules[2].cell:double():squeeze())
   myFile:close()
 
-  print('Writing memory state to /home/fl350/data/embedding-lstm2.h5')
-  myFile = hdf5.open('/home/fl350/data/embedding-lstm2.h5', 'w')
-  myFile:write('/home/fl350/data/embedding-lstm2.h5', self.net.modules[6].cell:double():squeeze())
+  print('Writing memory state to ' .. out_dir .. '/embedding-lstm2.h5')
+  myFile = hdf5.open(out_dir .. '/embedding-lstm2.h5', 'w')
+  myFile:write(out_dir .. '/embedding-lstm2.h5', self.net.modules[6].cell:double():squeeze())
   myFile:close()
 
-  print('Writing char embeddings to /home/fl350/data/char_embeddings.h5')
-  myFile = hdf5.open('/home/fl350/data/char_embeddings.h5', 'w')
-  myFile:write('/home/fl350/data/char_embeddings.h5', self.net.modules[1].output:double():squeeze())
+  print('Writing char embeddings to ' .. out_dir .. '/char_embeddings.h5')
+  myFile = hdf5.open(out_dir .. '/char_embeddings.h5', 'w')
+  myFile:write(out_dir .. '/char_embeddings.h5', self.net.modules[1].output:double():squeeze())
   myFile:close()
 
   self:resetStates()
